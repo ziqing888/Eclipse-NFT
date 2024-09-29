@@ -1,6 +1,6 @@
 #!/bin/bash
 
-curl -s https://raw.githubusercontent.com/ziqing888/logo/main/logo.sh | bash
+curl -s https://raw.githubusercontent.com/ziqing888/logo.sh/main/logo.sh | bash
 sleep 3
 
 # 显示消息的函数
