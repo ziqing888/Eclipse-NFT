@@ -1,3 +1,4 @@
+
 import { createUmi } from '@metaplex-foundation/umi-bundle-defaults';
 import {
     TransactionBuilderSendAndConfirmOptions,
@@ -38,7 +39,7 @@ const NFT_DETAILS = {
     name: "名称",
     symbol: "符号",
     royalties: 500,
-    description: '信息，ZunXBT 指南',
+    description: '信息，ziqing 指南',
     imgType: 'image/jpg',
     attributes: [
         { trait_type: '准确性', value: '非常高' },
