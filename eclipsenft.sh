@@ -28,6 +28,7 @@ install_all() {
     fi
     show "Rust 安装完成。"
 
+    # 检查 Solana 是否已安装，若未安装则进行安装
     if ! command -v solana &> /dev/null; then
         show "未找到 Solana，正在安装 Solana..."
         if ! sh -c "$(curl -sSfL https://release.solana.com/v1.18.18/install)"; then
@@ -60,6 +61,7 @@ install_all() {
 
     export PATH="$HOME/.local/share/solana/install/active_release/bin:$PATH"
     
+    # 确认 Solana 是否可用
     if command -v solana &> /dev/null; then
         show "当前会话中可以使用 Solana。"
     else
@@ -103,9 +105,10 @@ setup_wallet() {
     solana config set --keypair "$KEYPAIR_PATH"
     show "钱包设置完成！"
 
-    cp "$KEYPAIR_PATH" "$PWD"
+    cp "$KEYPAIR_PATH" "$PWD"  # 复制钱包到当前工作目录
 }
 
+# 创建并安装依赖项的函数
 create_and_install_dependencies() {
     # 如果存在，则删除现有的 package.json
     rm -f package.json
@@ -145,6 +148,7 @@ EOF
     show "npm 依赖项安装完成。"
 }
 
+# TypeScript 文件设置函数
 ts_file_Setup() {
     # 检查 index.ts 是否存在并删除
     if [ -f index.ts ]; then
@@ -154,7 +158,7 @@ ts_file_Setup() {
     fi
     
     # 下载新的 index.ts 文件
-    if ! wget -O index.ts https://raw.githubusercontent.com/zunxbt/Eclipse-NFT/main/index.ts; then
+    if ! wget -O index.ts https://raw.githubusercontent.com/iqing888/Eclipse-NFT1/main/index.ts; then
         show "下载 index.ts 文件失败，正在退出。"
         exit 1
     fi
@@ -195,22 +199,25 @@ ts_file_Setup() {
 
     echo "NFT 详情和网络已更新在 $file_path"
     
+    # 检查 upload.ts 是否存在并删除
     if [ -f upload.ts ]; then
         rm upload.ts
     else
         echo "upload.ts 不存在，跳过删除。"
     fi
     
-    # 下载新的 upload.ts 文件
-    if ! wget -O upload.ts https://raw.githubusercontent.com/zunxbt/Eclipse-NFT/main/upload.ts; then
-        show "下载 upload.ts 文件失败，正在退出。"
-        exit 1
+    # 下载新的 upload.ts 文件   
+    if ! wget -O upload.ts https://raw.githubusercontent.com/ziqing888/Eclipse-NFT1/main/upload.ts; then        
+    show "下载 upload.ts 文件失败，正在退出。"       
+    exit 1    
     fi
 
+    # 初始化 TypeScript 配置
     rm -f tsconfig.json
     npx tsc --init
 }
 
+# 铸造的函数
 mint() {
     show "正在铸造..."
     if ! wget https://picsum.photos/200 -O image.jpg; then
@@ -236,4 +243,16 @@ show_menu() {
 }
 
 # 主循环
-while true;
+while true; do
+    show_menu  # 显示菜单
+    read -p "请选择操作（1-6）： " choice  # 获取用户选择
+    case $choice in
+        1) install_all ;;  # 安装 Node.js、Rust 和 Solana
+        2) setup_wallet ;;  # 设置钱包
+        3) create_and_install_dependencies ;;  # 安装 npm 依赖项
+        4) ts_file_Setup ;;  # 设置 TypeScript 文件
+        5) mint ;;  # 开始铸造
+        6) exit 0 ;;  # 退出
+        *) show "无效选择，请重试。" ;;  # 无效选择提示
+    esac
+done
