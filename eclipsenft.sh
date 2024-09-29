@@ -12,6 +12,14 @@ show() {
 # 创建 Eclipse 目录并进入
 mkdir -p Eclipse && cd Eclipse
 
+# 加载环境变量
+if [ -f .env ]; then
+    export $(cat .env | xargs)
+else
+    show "未找到 .env 文件，正在退出。"
+    exit 1
+fi
+
 # 安装 Node.js、npm、Rust 和 Solana 的函数
 install_all() {
     show "正在安装 Node.js 和 npm..."
@@ -167,8 +175,10 @@ ts_file_Setup() {
     read -p "请输入 NFT 名称： " nft_name
     read -p "请输入 NFT 符号： " nft_symbol
     read -p "请输入 NFT 描述（INFO）： " nft_info
-    read -p "请输入 Pinata API 密钥： " pinata_api_key
-    read -p "请输入 Pinata 秘密密钥： " pinata_secret_key
+
+    # 使用 .env 文件中的密钥
+    pinata_api_key="$PINATA_API_KEY"
+    pinata_secret_key="$PINATA_SECRET_KEY"
 
     # 提示用户选择网络类型
     echo "选择要创建 NFT 的网络："
@@ -225,51 +235,50 @@ mint() {
         exit 1
     fi
     if ! npx ts-node index.ts; then
-        show "铸造失败，正在退出。"
+        show "铸造 NFT 失败，正在退出。"
         exit 1
     fi
+    show "NFT 铸造完成！"
 }
 
 # 工具检查函数
-tool_check() {
-    show "正在检查工具..."
-
-    tools=("node" "npm" "rustc" "cargo" "solana")
-
-    for tool in "${tools[@]}"; do
-        if command -v "$tool" &> /dev/null; then
-            show "$tool: 已安装"
-        else
-            show "$tool: 未安装"
+check_tools() {
+    show "正在检查所需工具..."
+    for tool in "curl" "wget" "node" "npm" "tsc" "solana" "solana-keygen"; do
+        if ! command -v "$tool" &> /dev/null; then
+            echo "$tool 未安装。请安装后重试。"
+            exit 1
         fi
     done
+    show "所有工具已安装。"
 }
 
-# 显示菜单的函数
+# 显示菜单供用户选择
 show_menu() {
-    echo -e "\n\e[34m===== Eclipse NFT 设置菜单 =====\e[0m"
-    echo "1) 安装 Node.js、Rust 和 Solana"
+    echo "请选择操作:"
+    echo "1) 安装所有依赖"
     echo "2) 设置钱包"
-    echo "3) 安装 npm 依赖项"
-    echo "4) 设置铸造文件"
-    echo "5) 开始铸造"
+    echo "3) 创建并安装依赖项"
+    echo "4) 设置 TypeScript 文件"
+    echo "5) 铸造 NFT"
     echo "6) 检查工具"
     echo "7) 退出"
-    echo -e "===================================\n"
+
+    read -p "请输入您的选择（1-7）： " choice
+
+    case $choice in
+        1) install_all ;;
+        2) setup_wallet ;;
+        3) create_and_install_dependencies ;;
+        4) ts_file_Setup ;;
+        5) mint ;;
+        6) check_tools ;;
+        7) exit 0 ;;
+        *) show "无效选择，请重试。" ;;
+    esac
 }
 
-# 主循环
+# 主程序循环
 while true; do
-    show_menu  # 显示菜单
-    read -p "请选择操作（1-7）： " choice  # 获取用户选择
-    case $choice in
-        1) install_all ;;  # 安装 Node.js、Rust 和 Solana
-        2) setup_wallet ;;  # 设置钱包
-        3) create_and_install_dependencies ;;  # 安装 npm 依赖项
-        4) ts_file_Setup ;;  # 设置 TypeScript 文件
-        5) mint ;;  # 开始铸造
-        6) tool_check ;;  # 检查工具
-        7) exit 0 ;;  # 退出
-        *) show "无效选择，请重试。" ;;  # 无效选择提示
-    esac
+    show_menu
 done
