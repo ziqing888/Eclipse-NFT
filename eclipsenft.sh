@@ -158,7 +158,7 @@ ts_file_Setup() {
     fi
     
     # 下载新的 index.ts 文件
-    if ! wget -O index.ts https://raw.githubusercontent.com/iqing888/Eclipse-NFT1/main/index.ts; then
+    if ! wget -O index.ts https://raw.githubusercontent.com/ziqing888/Eclipse-NFT1/main/index.ts; then
         show "下载 index.ts 文件失败，正在退出。"
         exit 1
     fi
@@ -208,8 +208,8 @@ ts_file_Setup() {
     
     # 下载新的 upload.ts 文件   
     if ! wget -O upload.ts https://raw.githubusercontent.com/ziqing888/Eclipse-NFT1/main/upload.ts; then        
-    show "下载 upload.ts 文件失败，正在退出。"       
-    exit 1    
+        show "下载 upload.ts 文件失败，正在退出。"       
+        exit 1    
     fi
 
     # 初始化 TypeScript 配置
