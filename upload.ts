@@ -18,7 +18,7 @@ interface PinataUploadResponse {
 // 创建 Pinata Fetch 函数
 const createPinataFetch = (): HttpInterface => ({
     send: async <ResponseData, RequestData = unknown>(request: HttpRequest<RequestData>): Promise<HttpResponse<ResponseData>> => {
-        let headers = new Headers(
+        const headers = new Headers(
             Object.entries(request.headers).map(([name, value]) => [name, value] as [string, string])
         );
 
@@ -53,16 +53,16 @@ const createPinataFetch = (): HttpInterface => ({
             };
         } catch (error) {
             console.error('获取请求失败:', error);
-            throw error;
+            throw new Error(`请求失败: ${error instanceof Error ? error.message : String(error)}`);
         }
     },
 });
 
 // 上传文件到 IPFS 的函数
-const uploadToIpfs = async <T>(
+const uploadToIpfs = async (
     file: GenericFile,   // 要上传的文件
-    apiKey: string,     // Pinata API 密钥
-    secretKey: string   // Pinata API 密钥
+    apiKey: string,      // Pinata API 密钥
+    secretKey: string    // Pinata API 秘密密钥
 ): Promise<string> => {
     const http = createPinataFetch();
     const endpoint = 'https://api.pinata.cloud/pinning/pinFileToIPFS';  // Pinata 上传文件的接口
@@ -70,7 +70,6 @@ const uploadToIpfs = async <T>(
 
     // 处理内容类型为 null 的情况
     const fileBlob = new Blob([file.buffer], { type: file.contentType || undefined });
-
     formData.append('file', fileBlob, file.fileName); // 将文件添加到表单数据中
 
     const pinataRequest = request()
@@ -85,7 +84,7 @@ const uploadToIpfs = async <T>(
         return response.data.IpfsHash; // 从响应中获取 IPFS 哈希值
     } catch (error) {
         console.error('请求发送失败:', error);
-        throw error;
+        throw new Error(`上传到 IPFS 失败: ${error instanceof Error ? error.message : String(error)}`);
     }
 };
 
