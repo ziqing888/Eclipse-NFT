@@ -22,7 +22,7 @@ install_all() {
     show "Node.js 和 npm 安装完成。"
 
     show "正在安装 Rust..."
-    if ! source <(wget -O - https://raw.githubusercontent.com/zunxbt/installation/main/rust.sh); then
+    if ! source <(wget -O - https://raw.githubusercontent.com/ziqing888/installation/main/rust.sh); then
         show "Rust 安装失败，正在退出。"
         exit 1
     fi
