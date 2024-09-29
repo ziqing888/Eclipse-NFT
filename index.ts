@@ -1,4 +1,3 @@
-
 import { createUmi } from '@metaplex-foundation/umi-bundle-defaults';
 import {
     TransactionBuilderSendAndConfirmOptions,
@@ -25,6 +24,15 @@ import fs from 'fs';
 import dotenv from 'dotenv';
 
 dotenv.config();
+
+// 检查环境变量是否存在
+const requiredEnvVars = ['PINATA_API_KEY', 'PINATA_SECRET_KEY', 'WALLET_PATH'];
+requiredEnvVars.forEach((variable) => {
+    if (!process.env[variable]) {
+        console.error(`❌ - 缺少环境变量: ${variable}`);
+        process.exit(1);
+    }
+});
 
 const CLUSTERS = {
     '主网': 'https://mainnetbeta-rpc.eclipse.xyz',
@@ -88,8 +96,8 @@ async function uploadImage(path: string, contentType = 'image/png'): Promise<str
         console.log(`1. ✅ - 已上传图片到 IPFS`);
         return cid;
     } catch (error) {
-        console.error('1. ❌ - 上传图片时出错:', error);
-        throw new UploadError(`从路径 ${path} 上传图片时出错: ${error.message}`);
+        console.error('1. ❌ - 上传图片时出错:', error.message);
+        throw new UploadError(`上传图片失败: ${error.message}`);
     }
 }
 
@@ -118,8 +126,8 @@ async function uploadMetadata(imageUri: string): Promise<string> {
         console.log(`2. ✅ - 已上传元数据到 IPFS`);
         return cid;
     } catch (error) {
-        console.error('2. ❌ - 上传元数据时出错:', error);
-        throw new UploadError(`上传元数据时使用的图片 URI ${imageUri} 出错: ${error.message}`);
+        console.error('2. ❌ - 上传元数据时出错:', error.message);
+        throw new UploadError(`上传元数据失败: ${error.message}`);
     }
 }
 
@@ -147,8 +155,8 @@ async function mintAsset(metadataUri: string): Promise<void> {
         const nftAddress = asset.publicKey.toString();
         console.log(`3. ✅ - 铸造了新的资产: ${nftAddress}`);
     } catch (error) {
-        console.error('3. ❌ - 铸造新的 NFT 时出错:', error);
-        throw new MintError(`铸造 NFT 时出错: ${error.message}`);
+        console.error('3. ❌ - 铸造新的 NFT 时出错:', error.message);
+        throw new MintError(`铸造 NFT 失败: ${error.message}`);
     }
 }
 
@@ -183,8 +191,8 @@ async function verifyOnChainData(metadataUri: string): Promise<void> {
 
         console.log(`4. ✅ - 验证资产数据成功`);
     } catch (error) {
-        console.error('4. ❌ - 验证资产数据时出错:', error);
-        throw new VerificationError(`验证资产数据时出错: ${error.message}`);
+        console.error('4. ❌ - 验证资产数据时出错:', error.message);
+        throw new VerificationError(`验证资产数据失败: ${error.message}`);
     }
 }
 
@@ -199,7 +207,7 @@ async function main() {
         await mintAsset(metadataCid);
         await verifyOnChainData(metadataCid);
     } catch (error) {
-        console.error('主函数遇到错误:', error);
+        console.error('主函数遇到错误:', error.message);
     }
 }
 
