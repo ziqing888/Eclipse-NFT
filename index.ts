@@ -104,7 +104,7 @@ async function uploadImage(path: string, contentType = 'image/png'): Promise<str
 async function uploadMetadata(imageUri: string): Promise<string> {
     try {
         const gatewayUrl = 'https://gateway.pinata.cloud/ipfs';
-        const fullImageUri = `${gatewayUrl}${imageUri}`;
+        const fullImageUri = `${gatewayUrl}/${imageUri}`;
 
         const metadata = {
             name: NFT_DETAILS.name,
