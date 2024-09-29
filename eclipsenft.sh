@@ -193,9 +193,9 @@ ts_file_Setup() {
     sed -i "s/NAME/$nft_name/" "$file_path"
     sed -i "s/SYMBOL/$nft_symbol/" "$file_path"
     sed -i "s/INFO/$nft_info/" "$file_path"
-    sed -i "s/ZUNXBT1/$pinata_api_key/" "$file_path"
-    sed -i "s/ZUNXBT2/$pinata_secret_key/" "$file_path"
-    sed -i "s/ZUNXBT3/$network/" "$file_path"
+    sed -i "s/ziqing1/$pinata_api_key/" "$file_path"
+    sed -i "s/ziqing2/$pinata_secret_key/" "$file_path"
+    sed -i "s/ziqing3/$network/" "$file_path"
 
     echo "NFT 详情和网络已更新在 $file_path"
     
@@ -230,6 +230,21 @@ mint() {
     fi
 }
 
+# 工具检查函数
+tool_check() {
+    show "正在检查工具..."
+
+    tools=("node" "npm" "rustc" "cargo" "solana")
+
+    for tool in "${tools[@]}"; do
+        if command -v "$tool" &> /dev/null; then
+            show "$tool: 已安装"
+        else
+            show "$tool: 未安装"
+        fi
+    done
+}
+
 # 显示菜单的函数
 show_menu() {
     echo -e "\n\e[34m===== Eclipse NFT 设置菜单 =====\e[0m"
@@ -238,21 +253,23 @@ show_menu() {
     echo "3) 安装 npm 依赖项"
     echo "4) 设置铸造文件"
     echo "5) 开始铸造"
-    echo "6) 退出"
+    echo "6) 检查工具"
+    echo "7) 退出"
     echo -e "===================================\n"
 }
 
 # 主循环
 while true; do
     show_menu  # 显示菜单
-    read -p "请选择操作（1-6）： " choice  # 获取用户选择
+    read -p "请选择操作（1-7）： " choice  # 获取用户选择
     case $choice in
         1) install_all ;;  # 安装 Node.js、Rust 和 Solana
         2) setup_wallet ;;  # 设置钱包
         3) create_and_install_dependencies ;;  # 安装 npm 依赖项
         4) ts_file_Setup ;;  # 设置 TypeScript 文件
         5) mint ;;  # 开始铸造
-        6) exit 0 ;;  # 退出
+        6) tool_check ;;  # 检查工具
+        7) exit 0 ;;  # 退出
         *) show "无效选择，请重试。" ;;  # 无效选择提示
     esac
 done
